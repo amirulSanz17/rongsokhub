@@ -13,29 +13,38 @@ if (isset($_POST['action'])) {
     $stmt = $pdo->prepare("UPDATE pickup_requests SET status = ? WHERE id = ? AND collector_id = ?");
     $stmt->execute([$status, $requestId, $collectorId]);
     
+    // Keep item status synced with request status
+    $itemStatus = '';
     if ($status == 'accepted') {
-        // Update item status
-        $stmt2 = $pdo->prepare("
-            UPDATE items SET status = 'diproses' 
+        $itemStatus = 'diproses';
+    } elseif ($status == 'rejected') {
+        $itemStatus = 'tersedia';
+    }
+
+    if ($itemStatus !== '') {
+        $stmt2 = $pdo->prepare("\
+            UPDATE items SET status = ? \
             WHERE id = (SELECT item_id FROM pickup_requests WHERE id = ?)
         ");
-        $stmt2->execute([$requestId]);
+        $stmt2->execute([$itemStatus, $requestId]);
     }
     
     header('Location: incoming.php');
     exit();
 }
 
-// Get incoming requests (warga request to this collector)
+// Get incoming pending requests for this collector
 $stmt = $pdo->prepare("
     SELECT pr.*, 
-           i.nama_barang, i.berat, i.alamat, i.deskripsi,
-           u.nama as warga_nama, u.phone as warga_phone,
-           (SELECT foto FROM item_photos WHERE item_id = i.id LIMIT 1) as foto
+        i.nama_barang, i.berat, i.alamat, i.deskripsi,
+        c.nama_kategori,
+        u.nama as warga_nama, u.phone as warga_phone,
+        (SELECT foto FROM item_photos WHERE item_id = i.id LIMIT 1) as foto
     FROM pickup_requests pr
     JOIN items i ON pr.item_id = i.id
     JOIN users u ON pr.warga_id = u.id
-    WHERE pr.collector_id = ? AND pr.request_by = 'warga' AND pr.status = 'pending'
+    JOIN categories c ON i.category_id = c.id
+    WHERE pr.collector_id = ? AND pr.status = 'pending'
     ORDER BY pr.created_at DESC
 ");
 $stmt->execute([$collectorId]);
@@ -86,7 +95,7 @@ $requests = $stmt->fetchAll();
                             </div>
                             <div class="flex-1">
                                 <h3 class="text-xl font-bold"><?= htmlspecialchars($req['nama_barang']) ?></h3>
-                                <p class="text-gray-600">Kategori: <?= $req['nama_barang'] ?></p>
+                                <p class="text-gray-600">Kategori: <?= htmlspecialchars($req['nama_kategori']) ?></p>
                                 <p class="text-gray-600">Berat: <?= $req['berat'] ?> kg</p>
                                 <p class="text-gray-600">📍 Alamat: <?= htmlspecialchars($req['alamat']) ?></p>
                                 <p class="text-gray-600">👤 Pemilik: <?= htmlspecialchars($req['warga_nama']) ?> (📞 <?= $req['warga_phone'] ?>)</p>

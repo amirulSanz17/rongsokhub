@@ -7,6 +7,25 @@ redirectIfNotRole('admin');
 if (isset($_POST['update_status'])) {
     $stmt = $pdo->prepare("UPDATE pickup_requests SET status = ? WHERE id = ?");
     $stmt->execute([$_POST['status'], $_POST['request_id']]);
+    
+    $status = $_POST['status'];
+    if ($status == 'accepted') {
+        $itemStatus = 'diproses';
+    } elseif ($status == 'rejected') {
+        $itemStatus = 'tersedia';
+    } elseif ($status == 'completed') {
+        $itemStatus = 'selesai';
+    } else {
+        $itemStatus = '';
+    }
+
+    if ($itemStatus !== '') {
+        $stmt2 = $pdo->prepare("\
+            UPDATE items SET status = ? \
+            WHERE id = (SELECT item_id FROM pickup_requests WHERE id = ?)
+        ");
+        $stmt2->execute([$itemStatus, $_POST['request_id']]);
+    }
     header('Location: requests.php?msg=updated');
     exit();
 }

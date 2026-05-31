@@ -13,13 +13,18 @@ if (isset($_POST['update_pickup'])) {
     $stmt = $pdo->prepare("UPDATE pickup_requests SET status = ? WHERE id = ? AND collector_id = ?");
     $stmt->execute([$status, $requestId, $collectorId]);
     
-    if ($status == 'completed') {
-        // Update item status to selesai
-        $stmt2 = $pdo->prepare("
-            UPDATE items SET status = 'selesai' 
+    if ($status == 'pickup') {
+        $itemStatus = 'diproses';
+    } elseif ($status == 'completed') {
+        $itemStatus = 'selesai';
+    }
+
+    if (!empty($itemStatus)) {
+        $stmt2 = $pdo->prepare("\
+            UPDATE items SET status = ? \
             WHERE id = (SELECT item_id FROM pickup_requests WHERE id = ?)
         ");
-        $stmt2->execute([$requestId]);
+        $stmt2->execute([$itemStatus, $requestId]);
     }
     
     header('Location: pickup.php');

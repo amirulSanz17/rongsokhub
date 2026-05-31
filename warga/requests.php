@@ -24,8 +24,18 @@ $requests = $stmt->fetchAll();
 
 // Cancel request
 if (isset($_GET['cancel'])) {
-    $stmt = $pdo->prepare("UPDATE pickup_requests SET status = 'rejected' WHERE id = ? AND warga_id = ? AND status = 'pending'");
+    $stmt = $pdo->prepare("SELECT * FROM pickup_requests WHERE id = ? AND warga_id = ? AND status = 'pending'");
     $stmt->execute([$_GET['cancel'], $userId]);
+    $request = $stmt->fetch();
+
+    if ($request) {
+        $stmt = $pdo->prepare("UPDATE pickup_requests SET status = 'rejected' WHERE id = ?");
+        $stmt->execute([$_GET['cancel']]);
+
+        $stmt2 = $pdo->prepare("UPDATE items SET status = 'tersedia' WHERE id = ?");
+        $stmt2->execute([$request['item_id']]);
+    }
+
     header('Location: requests.php?msg=cancelled');
     exit();
 }
