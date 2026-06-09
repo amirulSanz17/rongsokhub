@@ -56,20 +56,7 @@ RongsokHub adalah sistem web untuk menghubungkan warga yang ingin menjual atau m
 - MySQL / MariaDB
 - Web server lokal seperti Laragon, XAMPP, atau WAMP
 
-## Instalasi
-
-1. Salin folder proyek ke folder `www` atau `htdocs` server lokal Anda.
-2. Import file `.sql` ke database MySQL untuk membuat struktur tabel dan data awal.
-3. Sesuaikan koneksi database di `config/database.php` jika diperlukan:
-
-```php
-$host = 'localhost';
-$dbname = 'rongsokhub';
-$username = 'root';
-$password = '';
-```
-
-4. Akses aplikasi melalui browser, misalnya:
+## Akses aplikasi melalui browser, misalnya:
 
 ```
 http://localhost/rongsokhub/
@@ -91,7 +78,7 @@ File `.sql` di root berisi:
 Terdapat akun admin default:
 
 - Email: `admin@rongsokhub.com`
-- Password: `password`
+- Password: `123`
 
 ## Catatan
 
