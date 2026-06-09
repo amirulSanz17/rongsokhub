@@ -1,5 +1,7 @@
 # RongsokHub
 
+RongsokHub lahir dari pengalaman saya mengikuti kegiatan pengumpulan rongsok di sekitar Jakarta Utara, tepatnya di Sunter. Dari kegiatan itu, saya melihat bahwa proses pengumpulan, penawaran, dan penjemputan masih banyak dilakukan secara manual. Akhirnya saya membuat sistem ini untuk membantu menghubungkan warga dan pengepul dengan lebih mudah. Saya berperan dalam menganalisis kebutuhan, merancang aliran data, serta merancang antarmuka dan fitur yang mendukung pencatatan item, pengelolaan pengepul, dan pelacakan status permintaan.
+
 RongsokHub adalah sistem web untuk menghubungkan warga yang ingin menjual atau menukar barang rongsok dengan pengepul. Aplikasi ini dibangun dengan PHP, MySQL, dan Tailwind CSS.
 
 ## Fitur Utama
